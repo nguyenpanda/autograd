@@ -1,0 +1,19 @@
+[project]
+name = "autograd"
+version = "0.1.0"
+description = "Nguyenpanda Autograd"
+requires-python = ">=3.12"
+dependencies = [
+    "matplotlib>=3.11.1",
+    "nguyenpanda",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv.sources]
+autograd = { workspace = true, editable = true }
+
+[tool.hatch.build.targets.wheel]
+packages = ["autograd"]

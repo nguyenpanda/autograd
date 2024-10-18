@@ -1,7 +1,9 @@
 import ast
+import math
 
 from ..core import *
 from ..func import *
+from ..func.elementary import all_classes as _all_elementary_classes_
 from ..func.logarithm import all_classes as _all_logarithm_classes_
 from ..func.trigo import all_classes as _all_trigo_classes_
 
@@ -17,6 +19,7 @@ class ExpressionBuilder:
     }
 
     _functions_: dict[str, Function] = {
+        **{k.lower(): v for k, v in _all_elementary_classes_.items()},
         **{k.lower(): v for k, v in _all_logarithm_classes_.items()},
         **{k.lower(): v for k, v in _all_trigo_classes_.items()},
     }
@@ -40,9 +43,20 @@ class ExpressionBuilder:
             right = cls._build(_node.right)
             name: str = _node.op.__class__.__name__
             return cls._operators_[name](left, right)
-        elif isinstance(_node, ast.Num):
-            return Constant(_node.n)
+        elif isinstance(_node, ast.UnaryOp):
+            operand = cls._build(_node.operand)
+            if isinstance(_node.op, ast.USub):
+                return Multiply(Constant(-1), operand)
+            if isinstance(_node.op, ast.UAdd):
+                return operand
+            raise NotImplementedError(f'operator={_node.op.__class__.__name__} is not implemented!')
+        elif isinstance(_node, ast.Constant):
+            return Constant(_node.value)
         elif isinstance(_node, ast.Name):
+            if _node.id == 'e':
+                return Constant(math.e)
+            if _node.id == 'pi':
+                return Constant(math.pi)
             return Variable(_node.id)
         elif isinstance(_node, ast.Call):
             # noinspection PyUnresolvedReferences

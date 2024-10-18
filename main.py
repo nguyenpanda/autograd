@@ -8,7 +8,7 @@ from autograd.func import *
 @autograd.utils.performance()
 def demo1():
     with autograd.utils.PerformanceTimer() as timer:
-        x = autograd.symbol('x')
+        x: autograd.core.Variable = autograd.symbol('x') # type: ignore
         f = Cos(x) + Sin(x * x / 100) * x / 50
 
         rand = (-30, 100)
@@ -35,7 +35,7 @@ def demo1():
 @autograd.utils.performance()
 def demo2():
     with autograd.utils.PerformanceTimer() as timer:
-        x = autograd.symbol('x')
+        x: autograd.core.Variable = autograd.symbol('x') # type: ignore
         f = 'x*x+1/(sin(x)-1.05)'
         f = autograd.parser.parser_expression(f)
 
@@ -63,7 +63,7 @@ def demo2():
 @autograd.utils.performance()
 def demo3():
     with autograd.utils.PerformanceTimer() as timer:
-        x = autograd.symbol('x')
+        x: autograd.core.Variable = autograd.symbol('x') # type: ignore
 
         f = '4*x - x*x + 10*sin(x) + cos(ln(x+10)-x) + 10'
         f = autograd.parser.parser_expression(f)

@@ -184,12 +184,22 @@ class Divide(Operator):
 
 class Power(Operator):
 
-    def evaluate_and_derive(self, var: Optional['Variable'] = None, **kwargs: number) -> Node:
+    def evaluate_and_derive(self, var: Optional["Variable"] = None, **kwargs: number) -> Node:
         l, r = self._return_lhs_rhs_node(var, **kwargs)
-        if l.v < 0:
-            raise ValueError(f'[{l}] ^ [{r}] = {l.v} ^ {r.v} is not valid')
-
-        power: number = l.v ** r.v
+        try:
+            power: number = l.v**r.v
+        except (ValueError, ZeroDivisionError) as e:
+            raise ValueError(f'[{l}] ^ [{r}] = {l.v} ^ {r.v} is not valid') from e
+        if isinstance(power, complex):
+            raise ValueError(f'[{l}] ^ [{r}] = {l.v} ^ {r.v} is not real')
+        if var is None:
+            return Node(power, math.inf)
+        if isinstance(self.rhs, Constant):
+            if r.v == 0:
+                return Node(power, 0.0)
+            return Node(power, r.v * (l.v ** (r.v - 1)) * l.p)
+        if l.v <= 0:
+            raise ValueError(f'[{l}] ^ [{r}] = {l.v} ^ {r.v} is not differentiable')
         return Node(
             power,
             power * (l.p * r.v / l.v + math.log(l.v) * r.p),

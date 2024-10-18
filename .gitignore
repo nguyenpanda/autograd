@@ -164,3 +164,4 @@ cython_debug/
 /play_ground/
 /autograd_v2/
 /test/
+*.DS_Store
